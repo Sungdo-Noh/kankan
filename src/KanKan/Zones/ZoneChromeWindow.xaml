@@ -1,0 +1,167 @@
+<Window x:Class="KanKan.Zones.ZoneChromeWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        ResizeMode="NoResize" ShowInTaskbar="False" ShowActivated="False">
+    <Window.Resources>
+        <Style x:Key="HeaderButton" TargetType="Button">
+            <Setter Property="Width" Value="28"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bg" Background="Transparent" CornerRadius="4" Margin="2,4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="#33FFFFFF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ToolButton" TargetType="Button">
+            <Setter Property="Width" Value="34"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Margin" Value="3,0"/>
+            <Setter Property="Foreground" Value="#707070"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <!-- 눌러도 편집기의 포커스·선택 영역이 유지되도록 -->
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bg" Background="Transparent" CornerRadius="5">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="#1A000000"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!--
+            메모 스크롤바의 평소 모습: 오른쪽 끝의 아주 얇은 반투명 막대.
+            막대는 3px이지만 12px 띠 전체가 마우스를 받아서, 올리면 일반 스크롤바로 바뀐다 (코드에서 전환)
+        -->
+        <Style x:Key="ThinScrollBar" TargetType="ScrollBar">
+            <Setter Property="Width" Value="12"/>
+            <Setter Property="MinWidth" Value="12"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Grid Background="Transparent">
+                            <Track x:Name="PART_Track" IsDirectionReversed="True"
+                                   HorizontalAlignment="Right" Width="3" Margin="0,4,3,4">
+                                <Track.Thumb>
+                                    <Thumb>
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="Thumb">
+                                                <Border Background="#55000000" CornerRadius="1.5"/>
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid x:Name="Root"
+          IsKeyboardFocusWithinChanged="Root_IsKeyboardFocusWithinChanged"
+          PreviewMouseLeftButtonDown="Root_PreviewMouseLeftButtonDown"
+          MouseMove="Root_MouseMove"
+          MouseLeftButtonUp="Root_MouseLeftButtonUp"
+          LostMouseCapture="Root_LostMouseCapture">
+
+        <!-- 크기 조절 손잡이: 거의 투명(알파 1)이지만 클릭은 받는다. 모서리까지 잡히도록 각지게 둔다 -->
+        <Border x:Name="ResizeFrame" BorderThickness="6" BorderBrush="#01000000"/>
+
+        <Border x:Name="Outline" Panel.ZIndex="3" Margin="4" BorderThickness="1.5" CornerRadius="8" IsHitTestVisible="False"/>
+
+        <Border x:Name="Header" Panel.ZIndex="2" Margin="4,4,4,0" Height="32" VerticalAlignment="Top" CornerRadius="8,8,0,0">
+            <DockPanel LastChildFill="True" Margin="0,0,4,0">
+                <Button x:Name="MenuButton" DockPanel.Dock="Right" Style="{StaticResource HeaderButton}"
+                        Content="&#x22EF;" FontSize="16" ToolTip="메뉴" Click="MenuButton_Click"/>
+                <Button x:Name="PinButton" DockPanel.Dock="Right" Style="{StaticResource HeaderButton}"
+                        FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="13"
+                        Click="PinButton_Click"/>
+                <Button x:Name="NewZoneButton" DockPanel.Dock="Right" Style="{StaticResource HeaderButton}"
+                        Content="+" FontSize="18" ToolTip="옆에 새 영역 만들기 (같은 크기·다른 색)"
+                        Click="NewZoneButton_Click"/>
+                <Grid>
+                    <TextBlock x:Name="TitleText" Margin="12,0,0,0" VerticalAlignment="Center"
+                               FontSize="13" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"
+                               ToolTip="더블클릭해서 이름 바꾸기"/>
+                    <!-- 왼쪽 정렬이라 입력한 글자 길이만큼만 넓어지고, 헤더 폭을 넘으면 그 안에서 스크롤된다 -->
+                    <TextBox x:Name="TitleEditor" Margin="8,4,4,4" Padding="2,0" VerticalContentAlignment="Center"
+                             HorizontalAlignment="Left" MinWidth="60"
+                             FontSize="13" FontWeight="SemiBold" MaxLength="40" Visibility="Collapsed"
+                             KeyDown="TitleEditor_KeyDown" LostKeyboardFocus="TitleEditor_LostKeyboardFocus"/>
+                </Grid>
+            </DockPanel>
+        </Border>
+
+        <!--
+            메모 모드: 메모 판이 영역 전체를 채우고, 제목 바는 그 위쪽에 항상 겹쳐 있다.
+            서식 툴바는 메모를 편집하는 동안에만 아래쪽에 나타나고, 그동안 글 영역(MemoScroll)이 그만큼 줄어든다.
+        -->
+        <Border x:Name="MemoPanel" Margin="4" CornerRadius="8" Visibility="Collapsed"
+                PreviewMouseLeftButtonDown="MemoPanel_PreviewMouseLeftButtonDown">
+            <ScrollViewer x:Name="MemoScroll" VerticalScrollBarVisibility="Auto">
+                <!-- 스크롤바를 글 위에 겹쳐 그려서, 얇은 막대 ↔ 일반 스크롤바로 바뀌어도 글 줄바꿈이 흔들리지 않게 한다 -->
+                <ScrollViewer.Template>
+                    <ControlTemplate TargetType="ScrollViewer">
+                        <Grid>
+                            <ScrollContentPresenter CanContentScroll="{TemplateBinding CanContentScroll}"/>
+                            <ScrollBar x:Name="PART_VerticalScrollBar" HorizontalAlignment="Right" Orientation="Vertical"
+                                       Style="{StaticResource ThinScrollBar}"
+                                       Maximum="{TemplateBinding ScrollableHeight}"
+                                       ViewportSize="{TemplateBinding ViewportHeight}"
+                                       Value="{Binding VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                       Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"/>
+                        </Grid>
+                    </ControlTemplate>
+                </ScrollViewer.Template>
+                <StackPanel x:Name="MemoList"/>
+            </ScrollViewer>
+        </Border>
+
+        <Border x:Name="MemoToolbar" Panel.ZIndex="2" Margin="4,0,4,4" Height="40" VerticalAlignment="Bottom" CornerRadius="0,0,8,8"
+                BorderThickness="0,1,0,0" BorderBrush="#18000000" Padding="8,4" Visibility="Collapsed">
+                    <StackPanel Orientation="Horizontal">
+                        <Button Style="{StaticResource ToolButton}" ToolTip="굵게 (Ctrl+B)" Click="Bold_Click">
+                            <TextBlock Text="B" FontWeight="Bold"/>
+                        </Button>
+                        <Button Style="{StaticResource ToolButton}" ToolTip="취소선 (Ctrl+Shift+S)" Click="Strike_Click">
+                            <TextBlock Text="S" TextDecorations="Strikethrough"/>
+                        </Button>
+                        <Button Style="{StaticResource ToolButton}" ToolTip="체크리스트 (Ctrl+Shift+C)" Click="Checklist_Click"
+                                Content="&#x2611;" FontSize="19" FontFamily="Segoe UI Symbol"/>
+                        <Button Style="{StaticResource ToolButton}" ToolTip="글머리 기호 (Ctrl+Shift+L)" Click="Bullets_Click"
+                                Content="&#x2022;" FontSize="22"/>
+                        <Button x:Name="TextColorButton" Style="{StaticResource ToolButton}" ToolTip="글자 색" Click="TextColor_Click">
+                            <StackPanel>
+                                <TextBlock Text="A" HorizontalAlignment="Center"/>
+                                <Border Width="17" Height="3" Background="#A0A0A0" CornerRadius="1"/>
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="HighlightButton" Style="{StaticResource ToolButton}" ToolTip="형광펜" Click="Highlight_Click">
+                            <Border Background="#E4E4E4" CornerRadius="2" Padding="4,0">
+                                <TextBlock Text="A"/>
+                            </Border>
+                        </Button>
+                    </StackPanel>
+        </Border>
+    </Grid>
+</Window>

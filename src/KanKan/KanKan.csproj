@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <!-- 트레이 아이콘(NotifyIcon)과 모니터 정보(Screen)용 -->
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AssemblyName>KanKan</AssemblyName>
+    <RootNamespace>KanKan</RootNamespace>
+    <ApplicationIcon>Assets\kankan.ico</ApplicationIcon>
+    <Version>0.1.1</Version>
+    <Product>칸칸</Product>
+    <AssemblyTitle>칸칸 - 바탕화면 영역 정리</AssemblyTitle>
+    <!-- WPF 앱이라 DPI 설정은 app.manifest에서 한다 (WinForms 전용 권고 경고 끔) -->
+    <NoWarn>$(NoWarn);WFAC010</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- WPF와 이름이 겹치지 않도록 WinForms 전역 using은 빼고 필요한 파일에서만 쓴다 -->
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="KanKan.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- 트레이 아이콘용 (scripts\make-icon.ps1 로 생성) -->
+    <EmbeddedResource Include="Assets\kankan.ico" LogicalName="KanKan.ico" />
+  </ItemGroup>
+
+</Project>

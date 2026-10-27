@@ -1,0 +1,28 @@
+<UserControl x:Class="KanKan.Memos.MemoCard"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Border Padding="10,8,10,8" Background="Transparent">
+        <Grid>
+            <RichTextBox x:Name="Editor" Padding="0" BorderThickness="0" Background="Transparent"
+                         FontFamily="Malgun Gothic, Segoe UI Symbol" FontSize="14" Foreground="#222222"
+                         AcceptsTab="True" VerticalScrollBarVisibility="Disabled"
+                         TextChanged="Editor_TextChanged"
+                         LostKeyboardFocus="Editor_LostKeyboardFocus"
+                         PreviewKeyDown="Editor_PreviewKeyDown"
+                         PreviewMouseLeftButtonDown="Editor_PreviewMouseLeftButtonDown"
+                         PreviewMouseWheel="Editor_PreviewMouseWheel">
+                <RichTextBox.Resources>
+                    <!-- 문단 줄 간격은 영역의 텍스트 설정에 따라 MemoCard.ApplyTextStyle에서 정한다 -->
+                    <Style TargetType="List">
+                        <Setter Property="Margin" Value="0,1"/>
+                        <Setter Property="Padding" Value="18,0,0,0"/>
+                    </Style>
+                </RichTextBox.Resources>
+            </RichTextBox>
+
+            <TextBlock x:Name="Placeholder" Margin="2,0,0,0" IsHitTestVisible="False"
+                       FontFamily="Malgun Gothic, Segoe UI Symbol" FontSize="14" Foreground="#77222222"
+                       Text="메모를 입력하세요"/>
+        </Grid>
+    </Border>
+</UserControl>

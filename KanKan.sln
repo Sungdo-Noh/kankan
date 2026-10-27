@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{DC801A17-ED71-47FD-94A9-14E27C2E9C00}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KanKan", "src\KanKan\KanKan.csproj", "{5204C11F-AFF5-42A6-BDE8-A70A3C7E61A9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{A7ED2999-218C-4B38-9BE1-3900B47BEC30}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KanKan.Tests", "tests\KanKan.Tests\KanKan.Tests.csproj", "{181B9186-B306-441F-89F1-A5FAF19003B0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5204C11F-AFF5-42A6-BDE8-A70A3C7E61A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5204C11F-AFF5-42A6-BDE8-A70A3C7E61A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5204C11F-AFF5-42A6-BDE8-A70A3C7E61A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5204C11F-AFF5-42A6-BDE8-A70A3C7E61A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{181B9186-B306-441F-89F1-A5FAF19003B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{181B9186-B306-441F-89F1-A5FAF19003B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{181B9186-B306-441F-89F1-A5FAF19003B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{181B9186-B306-441F-89F1-A5FAF19003B0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5204C11F-AFF5-42A6-BDE8-A70A3C7E61A9} = {DC801A17-ED71-47FD-94A9-14E27C2E9C00}
+		{181B9186-B306-441F-89F1-A5FAF19003B0} = {A7ED2999-218C-4B38-9BE1-3900B47BEC30}
+	EndGlobalSection
+EndGlobal
